@@ -26,7 +26,7 @@ public partial class MainWindow : Window
     {
         await _updateManager.UpdateApp();
         var messageBox = MessageBoxManager
-            .GetMessageBoxStandard("Info", "Update successsssss", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+            .GetMessageBoxStandard("Info", "Update successssssssss", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
         await messageBox.ShowWindowDialogAsync(this);
         
     }
