@@ -16,9 +16,11 @@ public partial class MainWindow : Window
         Loaded += MainWindow_Loaded;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        _updateManager = new UpdateManager("D:\\Dev\\SquirrelWindow\\Deployment\\Releases");
+        // _updateManager = new UpdateManager("D:\\Dev\\SquirrelWindow\\Deployment\\Releases");
+        _updateManager = await UpdateManager
+            .GitHubUpdateManager(@"https://github.com/manhtran98bg/AutoUpdate");
     }
     private async void ButtonUpdate_OnClick(object? sender, RoutedEventArgs e)
     {
