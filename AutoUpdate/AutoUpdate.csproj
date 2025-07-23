@@ -6,6 +6,12 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <Title>AutoUpdate</Title>
+        <Authors>Manh Tran</Authors>
+        <Description>Auto Update application using Squirrel.Window       </Description>
+        <Copyright>2025 ManhTran</Copyright>
+        <RepositoryUrl>https://github.com/NuGetPackageExplorer/NuGetPackageExplorer</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,5 +30,57 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="GitVersion.MSBuild" Version="6.3.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="squirrel.windows" Version="1.9.0" />
     </ItemGroup>
+
+    <Target Name="ReleaseWithSquirrel" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+        <PropertyGroup>
+            <ResolvedVersion Condition="'$(GitVersion_NuGetVersionV2)' != ''">$(GitVersion_NuGetVersionV2)</ResolvedVersion>
+            <ResolvedVersion Condition="'$(GitVersion_NuGetVersionV2)' == ''">$(GitVersion_FullSemVer)</ResolvedVersion>
+            <!--Meta data-->
+            <PackageId>$(MSBuildProjectName)</PackageId>
+            <Version>$(ResolvedVersion)</Version>
+        </PropertyGroup>
+
+        <ItemGroup>
+            <NuspecLines Include="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;" />
+            <NuspecLines Include="&lt;package&gt;" />
+            <NuspecLines Include="  &lt;metadata&gt;" />
+            <NuspecLines Include="    &lt;id&gt;$(PackageId)&lt;/id&gt;" />
+            <NuspecLines Include="    &lt;version&gt;$(ResolvedVersion)&lt;/version&gt;" />
+            <NuspecLines Include="    &lt;title&gt;$(Title)&lt;/title&gt;" />
+            <NuspecLines Include="    &lt;authors&gt;$(Authors)&lt;/authors&gt;" />
+            <NuspecLines Include="    &lt;requireLicenseAcceptance&gt;false&lt;/requireLicenseAcceptance&gt;" />
+            <NuspecLines Include="    &lt;repository type=&quot;$(RepositoryType)&quot; url=&quot;$(RepositoryUrl)&quot; /&gt;" />
+            <NuspecLines Include="    &lt;description&gt;$(Description)&lt;/description&gt;" />
+            <NuspecLines Include="    &lt;copyright&gt;$(Copyright)&lt;/copyright&gt;" />
+            <NuspecLines Include="    &lt;tags&gt;$(ResolvedVersion)&lt;/tags&gt;" />
+            <NuspecLines Include="  &lt;/metadata&gt;" />
+            <NuspecLines Include="  &lt;files&gt;" />
+            <NuspecLines Include="    &lt;file src=&quot;bin\$(Configuration)\net8.0\win-x64\publish\**&quot; target=&quot;lib\net8.0&quot; /&gt;" />
+            <NuspecLines Include="  &lt;/files&gt;" />
+            <NuspecLines Include="&lt;/package&gt;" />
+        </ItemGroup>
+
+        <!-- Create $(MSBuildProjectName).nuspec file -->
+        <WriteLinesToFile
+                File="$(MSBuildProjectName).nuspec"
+                Lines="@(NuspecLines)"
+                Overwrite="true" />
+        <Message Text="Generated $(MSBuildProjectName).nuspec with version $(ResolvedVersion)" Importance="High"/>
+        <Exec Command="nuget pack $(MSBuildProjectName).nuspec -OutputDirectory $(SolutionDir)Deployment\GeneratedNugets" />
+
+        <!--Release with Squirrel-->
+        <PropertyGroup>
+            <SquirrelTools>$(Pkgsquirrel_windows)\tools</SquirrelTools>
+        </PropertyGroup>
+        <Exec Command="$(SquirrelTools)\Squirrel.exe &#45;&#45;releasify $(SolutionDir)Deployment\GeneratedNugets\$(MSBuildProjectName).$(ResolvedVersion).nupkg &#45;&#45;releaseDir=$(SolutionDir)Deployment\Releases &#45;&#45;no-msi" />
+        <Message Text="Squirrel release created in $(SolutionDir)Deployment\Releases" Importance="High" />
+        <!--        <Delete Files="$(MSBuildProjectName).nuspec"/>-->
+    </Target>
+    
 </Project>

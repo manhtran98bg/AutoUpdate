@@ -6,11 +6,12 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using AutoUpdate.ViewModels;
 using AutoUpdate.Views;
-
+using Squirrel;
 namespace AutoUpdate;
 
 public partial class App : Application
 {
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -28,7 +29,7 @@ public partial class App : Application
                 DataContext = new MainWindowViewModel(),
             };
         }
-
+        
         base.OnFrameworkInitializationCompleted();
     }
 
