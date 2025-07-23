@@ -79,7 +79,7 @@
         <PropertyGroup>
             <SquirrelTools>$(Pkgsquirrel_windows)\tools</SquirrelTools>
         </PropertyGroup>
-        <Exec Command="$(SquirrelTools)\Squirrel.exe &#45;&#45;releasify $(SolutionDir)Deployment\GeneratedNugets\$(MSBuildProjectName).$(ResolvedVersion).nupkg &#45;&#45;releaseDir=$(SolutionDir)Deployment\Releases\$(MSBuildProjectName).$(ResolvedVersion) &#45;&#45;no-msi" />
+        <Exec Command="$(SquirrelTools)\Squirrel.exe &#45;&#45;releasify $(SolutionDir)Deployment\GeneratedNugets\$(MSBuildProjectName).$(ResolvedVersion).nupkg &#45;&#45;releaseDir=$(SolutionDir)Deployment\Releases &#45;&#45;no-msi" />
         <Message Text="Squirrel release created in $(SolutionDir)Deployment\Releases" Importance="High" />
         <Delete Files="$(MSBuildProjectName).nuspec"/>
     </Target>
