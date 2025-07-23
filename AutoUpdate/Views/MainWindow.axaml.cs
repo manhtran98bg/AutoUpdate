@@ -1,3 +1,4 @@
+using AutoUpdate.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Squirrel;
@@ -22,8 +23,20 @@ public partial class MainWindow : Window
         throw new System.NotImplementedException();
     }
 
-    private void ButtonCheckUpdate_OnClick(object? sender, RoutedEventArgs e)
+    private async void ButtonCheckUpdate_OnClick(object? sender, RoutedEventArgs e)
     {
-        throw new System.NotImplementedException();
+        var vm = DataContext as MainWindowViewModel;
+        if (vm == null)
+            return;
+        var updateInfo = await _updateManager!.CheckForUpdate();
+        if (updateInfo.ReleasesToApply.Count > 0)
+        {
+            vm.ReadyToUpdate = true;
+            vm.NewVersion = updateInfo.ReleasesToApply[0].Version.ToString();
+        }
+        else
+        {
+            vm.ReadyToUpdate = false;
+        }
     }
 }
