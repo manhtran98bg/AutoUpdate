@@ -1,6 +1,8 @@
 using AutoUpdate.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 using Squirrel;
 
 namespace AutoUpdate.Views;
@@ -18,9 +20,13 @@ public partial class MainWindow : Window
     {
         _updateManager = new UpdateManager("D:\\Dev\\SquirrelWindow\\Deployment\\Releases");
     }
-    private void ButtonUpdate_OnClick(object? sender, RoutedEventArgs e)
+    private async void ButtonUpdate_OnClick(object? sender, RoutedEventArgs e)
     {
-        throw new System.NotImplementedException();
+        await _updateManager.UpdateApp();
+        var messageBox = MessageBoxManager
+            .GetMessageBoxStandard("Info", "Update success", ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Info);
+        await messageBox.ShowWindowDialogAsync(this);
+        
     }
 
     private async void ButtonCheckUpdate_OnClick(object? sender, RoutedEventArgs e)
